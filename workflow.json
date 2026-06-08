@@ -1,0 +1,264 @@
+{
+  "name": "Demo 3 — Content Automation (topic → LLM draft → Notion + Sheets)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Content Brief",
+        "formDescription": "Enter a topic and we'll generate a first draft.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target audience",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Casual"
+                  },
+                  {
+                    "option": "Witty"
+                  }
+                ]
+              },
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Keywords (comma separated)",
+              "requiredField": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d3-001",
+      "name": "Topic Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        0
+      ],
+      "webhookId": "demo3-content-brief"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a blog post draft.\nTopic: {{ $json.Topic }}\nAudience: {{ $json['Target audience'] || 'general' }}\nTone: {{ $json.Tone || 'Professional' }}\nKeywords: {{ $json['Keywords (comma separated)'] || '' }}\n\nReturn the structured fields requested by the output parser.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert content writer and SEO editor. Produce a clean, publish-ready first draft. Be concrete, no filler. Honor the requested tone."
+        }
+      },
+      "id": "d3-002",
+      "name": "AI Agent: Draft",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        40,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "d3-003",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        220
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"string\",\n  \"slug\": \"string\",\n  \"meta_description\": \"string (<=155 chars)\",\n  \"outline\": [\"string\"],\n  \"draft_markdown\": \"string\",\n  \"tags\": [\"string\"]\n}"
+      },
+      "id": "d3-004",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": {
+          "__rl": true,
+          "value": "YOUR_NOTION_DATABASE_ID",
+          "mode": "id"
+        },
+        "title": "={{ $json.output.title }}",
+        "propertiesUi": {
+          "propertyValues": []
+        },
+        "options": {}
+      },
+      "id": "d3-005",
+      "name": "Notion: Create Draft Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        420,
+        -100
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content",
+          "mode": "list",
+          "cachedResultName": "Content"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "d3-006",
+      "name": "Google Sheets: Log Draft",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        420,
+        120
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Demo 3 — Content Automation\n\n**Flow:** Topic form -> LLM writes a structured draft (title, slug, meta, outline, markdown, tags) -> push to Notion as a new page + log to Google Sheets.\n\nUseful for content teams that draft at volume.",
+        "height": 220,
+        "width": 360,
+        "color": 5
+      },
+      "id": "d3-007",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Connect OpenAI, Notion and Google Sheets credentials.\nReplace YOUR_NOTION_DATABASE_ID and YOUR_GOOGLE_SHEET_ID.\n\nSECURITY: use a throwaway DEMO OpenAI key with a hard spending limit. Revoke it after filming the Loom.",
+        "height": 200,
+        "width": 360,
+        "color": 3
+      },
+      "id": "d3-008",
+      "name": "Sticky Note Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -280
+      ]
+    }
+  ],
+  "connections": {
+    "Topic Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Draft",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent: Draft",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent: Draft": {
+      "main": [
+        [
+          {
+            "node": "Notion: Create Draft Page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets: Log Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
