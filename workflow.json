@@ -1,5 +1,4 @@
 {
-  "name": "Demo 3 — Content Automation (topic → LLM draft → Notion + Sheets)",
   "nodes": [
     {
       "parameters": {
@@ -12,8 +11,7 @@
               "requiredField": true
             },
             {
-              "fieldLabel": "Target audience",
-              "requiredField": false
+              "fieldLabel": "Target audience"
             },
             {
               "fieldLabel": "Tone",
@@ -30,26 +28,24 @@
                     "option": "Witty"
                   }
                 ]
-              },
-              "requiredField": false
+              }
             },
             {
-              "fieldLabel": "Keywords (comma separated)",
-              "requiredField": false
+              "fieldLabel": "Keywords (comma separated)"
             }
           ]
         },
         "options": {}
       },
-      "id": "d3-001",
+      "id": "a64b530b-c3c0-4ac8-b4b6-ba9f7032d096",
       "name": "Topic Form Trigger",
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
       "position": [
-        -260,
-        0
+        -1504,
+        -368
       ],
-      "webhookId": "demo3-content-brief"
+      "webhookId": "fcc0d055-60f1-458f-b29a-7d3b5a1ab6b7"
     },
     {
       "parameters": {
@@ -60,13 +56,13 @@
           "systemMessage": "You are an expert content writer and SEO editor. Produce a clean, publish-ready first draft. Be concrete, no filler. Honor the requested tone."
         }
       },
-      "id": "d3-002",
+      "id": "713b25c4-d7ff-481c-9c86-6ee2bfe294b3",
       "name": "AI Agent: Draft",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        40,
-        0
+        -1200,
+        -368
       ]
     },
     {
@@ -79,38 +75,31 @@
         },
         "options": {}
       },
-      "id": "d3-003",
+      "id": "4aed38da-a637-4ca2-89b4-9191762fee03",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -40,
-        220
-      ],
-      "credentials": {
-        "openAiApi": {
-          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-          "name": "OpenAI account"
-        }
-      }
+        -1280,
+        -144
+      ]
     },
     {
       "parameters": {
         "jsonSchemaExample": "{\n  \"title\": \"string\",\n  \"slug\": \"string\",\n  \"meta_description\": \"string (<=155 chars)\",\n  \"outline\": [\"string\"],\n  \"draft_markdown\": \"string\",\n  \"tags\": [\"string\"]\n}"
       },
-      "id": "d3-004",
+      "id": "31a83952-9900-4901-a8e6-19b8e8df78ad",
       "name": "Structured Output Parser",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        200,
-        220
+        -1040,
+        -144
       ]
     },
     {
       "parameters": {
         "resource": "databasePage",
-        "operation": "create",
         "databaseId": {
           "__rl": true,
           "value": "YOUR_NOTION_DATABASE_ID",
@@ -122,20 +111,14 @@
         },
         "options": {}
       },
-      "id": "d3-005",
+      "id": "55a8bfc7-b40d-4ff9-b3a2-a7eb88597f17",
       "name": "Notion: Create Draft Page",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        420,
-        -100
-      ],
-      "credentials": {
-        "notionApi": {
-          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-          "name": "Notion account"
-        }
-      }
+        -832,
+        -464
+      ]
     },
     {
       "parameters": {
@@ -158,51 +141,45 @@
         },
         "options": {}
       },
-      "id": "d3-006",
+      "id": "96004aa6-9584-4d6c-bb4e-54eeba78b1a2",
       "name": "Google Sheets: Log Draft",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        420,
-        120
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "## Demo 3 — Content Automation\n\n**Flow:** Topic form -> LLM writes a structured draft (title, slug, meta, outline, markdown, tags) -> push to Notion as a new page + log to Google Sheets.\n\nUseful for content teams that draft at volume.",
-        "height": 220,
-        "width": 360,
-        "color": 5
-      },
-      "id": "d3-007",
-      "name": "Sticky Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -280,
-        -280
+        -832,
+        -240
       ]
     },
     {
       "parameters": {
-        "content": "Connect OpenAI, Notion and Google Sheets credentials.\nReplace YOUR_NOTION_DATABASE_ID and YOUR_GOOGLE_SHEET_ID.\n\nSECURITY: use a throwaway DEMO OpenAI key with a hard spending limit. Revoke it after filming the Loom.",
+        "content": "## Demo 3 — Content Automation\n\n**Flow:** Topic form → LLM writes a structured draft (title, slug, meta, outline, markdown, tags) → push to Notion as a new page + log to Google Sheets.\n\nUseful for content teams that draft at volume.",
+        "height": 220,
+        "width": 360,
+        "color": 5
+      },
+      "id": "6ffbd98c-4dc2-41a1-b15c-c8ec02100c9d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        -608
+      ]
+    },
+    {
+      "parameters": {
+        "content": "👉 Connect OpenAI, Notion and Google Sheets credentials.\n👉 Replace YOUR_NOTION_DATABASE_ID and YOUR_GOOGLE_SHEET_ID.\n\n⚠️ Use a throwaway DEMO OpenAI key with a hard spending limit. Revoke it after filming the Loom.",
         "height": 200,
         "width": 360,
         "color": 3
       },
-      "id": "d3-008",
+      "id": "ba0b3e29-2a8a-48b5-9eab-9ce7c0eb1cde",
       "name": "Sticky Note Setup",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        140,
-        -280
+        -832,
+        -624
       ]
     }
   ],
@@ -212,6 +189,22 @@
         [
           {
             "node": "AI Agent: Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent: Draft": {
+      "main": [
+        [
+          {
+            "node": "Notion: Create Draft Page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets: Log Draft",
             "type": "main",
             "index": 0
           }
@@ -239,26 +232,10 @@
           }
         ]
       ]
-    },
-    "AI Agent: Draft": {
-      "main": [
-        [
-          {
-            "node": "Notion: Create Draft Page",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Sheets: Log Draft",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "pinData": {}
+  "pinData": {},
+  "meta": {
+    "instanceId": "c802c10acc67c35f036716d36a5687107af21a072c3c4b176b04a3fcd3f47a7b"
+  }
 }
