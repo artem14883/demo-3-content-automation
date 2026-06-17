@@ -4,14 +4,12 @@
    ========================================================= */
 
 /* ---------- Config: edit me ---------- */
-// Contact form delivery.
-//  - Leave FORMSPREE_ID empty → the form opens the visitor's email app
-//    with a message pre-addressed to CONTACT_EMAIL (works with zero setup).
-//  - For automatic delivery (no mail app needed), create a free form at
-//    https://formspree.io using ripaartem25@gmail.com, then paste its id
-//    (the part after /f/, e.g. "xeoyabcd") into FORMSPREE_ID.
+// Contact form delivery (automatic, server-side via FormSubmit.co — no account,
+// no API key, the visitor's mail app never opens).
+// IMPORTANT: the very first message triggers a one-time activation email to
+// CONTACT_EMAIL — open it once and click "Activate". After that every message
+// is delivered to this inbox automatically.
 const CONTACT_EMAIL = "ripaartem25@gmail.com";
-const FORMSPREE_ID = "";
 
 const PROJECTS = [
   { no: "01", title: "Lumina", cat: "AI SaaS Platform", year: "2025",
@@ -213,7 +211,7 @@ const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").mat
   if (box) box.innerHTML = TECH.map((t) => `<span class="tech__chip">${t}</span>`).join("");
 })();
 
-/* ---------- Contact form → delivers to CONTACT_EMAIL ---------- */
+/* ---------- Contact form → the site emails CONTACT_EMAIL itself ---------- */
 (function form() {
   const f = $("#contactForm");
   const note = $("#formNote");
@@ -229,29 +227,30 @@ const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").mat
     if (!name || !email || !message) return fail("Please fill in all fields.");
 
     note.style.color = "";
+    note.textContent = "Sending…";
+    const btn = f.querySelector("button[type=submit]");
+    if (btn) btn.disabled = true;
 
-    if (FORMSPREE_ID) {
-      // Automatic delivery via Formspree → arrives in the CONTACT_EMAIL inbox.
-      note.textContent = "Sending…";
-      try {
-        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-          method: "POST",
-          headers: { Accept: "application/json" },
-          body: data,
-        });
-        if (!res.ok) throw new Error("send failed");
-        note.textContent = `Thanks, ${name}! Your message is on its way.`;
-        f.reset();
-      } catch {
-        fail(`Couldn't send right now — email me directly at ${CONTACT_EMAIL}`);
-      }
-    } else {
-      // Zero-setup fallback: open the visitor's email app addressed to CONTACT_EMAIL.
-      const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-      note.textContent = `Opening your email app to send to ${CONTACT_EMAIL}…`;
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(CONTACT_EMAIL)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          _subject: `New portfolio enquiry from ${name}`,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+      if (!res.ok) throw new Error("send failed");
+      note.textContent = `Thanks, ${name}! Your message has been sent.`;
       f.reset();
+    } catch {
+      fail(`Couldn't send right now — please email me directly at ${CONTACT_EMAIL}`);
+    } finally {
+      if (btn) btn.disabled = false;
     }
   });
 })();

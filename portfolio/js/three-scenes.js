@@ -133,23 +133,23 @@ function heroScene() {
   button.position.set(0, 1.44, 0);
   head.add(button);
 
-  // ---- glasses ----
+  // ---- glasses (lenses rest on the face, arms tuck back under the headphones) ----
   const glasses = new THREE.Group();
   [-1, 1].forEach((s) => {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.035, 16, 36), frame);
-    ring.position.set(s * 0.42, 0.08, 1.02);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.03, 16, 36), frame);
+    ring.position.set(s * 0.4, 0.06, 0.965);
     glasses.add(ring);
-    const glass = new THREE.Mesh(new THREE.CircleGeometry(0.24, 36), lens);
-    glass.position.set(s * 0.42, 0.08, 1.03);
+    const glass = new THREE.Mesh(new THREE.CircleGeometry(0.21, 36), lens);
+    glass.position.set(s * 0.4, 0.06, 0.97);
     glasses.add(glass);
-    // temple arm running back toward the ear
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.04, 0.04), frame);
-    arm.position.set(s * 0.8, 0.12, 0.6);
-    arm.rotation.y = s * 0.55;
+    // temple arm: hugs the side of the head and ends near the ear (hidden by the cup)
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.045, 0.045), frame);
+    arm.position.set(s * 0.78, 0.09, 0.46);
+    arm.rotation.y = s * 1.05;
     glasses.add(arm);
   });
-  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.045, 0.05), frame);
-  bridge.position.set(0, 0.12, 1.04);
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.04, 0.04), frame);
+  bridge.position.set(0, 0.09, 0.985);
   glasses.add(bridge);
   head.add(glasses);
 
