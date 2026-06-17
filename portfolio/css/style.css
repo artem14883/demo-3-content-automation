@@ -427,23 +427,6 @@ section { position: relative; }
   padding: .3rem .8rem;
 }
 .work__hint { margin-top: 1rem; color: var(--muted-2); font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; }
-.work-card__links { display: flex; gap: 1.4rem; margin-top: 1.2rem; }
-.work-card__links a {
-  font-size: .82rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text);
-  position: relative;
-}
-.work-card__links a::after {
-  content: "";
-  position: absolute; left: 0; bottom: -4px;
-  width: 100%; height: 1px;
-  background: var(--violet);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .3s var(--ease);
-}
-.work-card__links a:hover::after { transform: scaleX(1); }
 
 /* ---------- Timeline ---------- */
 .timeline { position: relative; margin-left: clamp(0px, 2vw, 1rem); }

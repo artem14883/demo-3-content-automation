@@ -4,7 +4,15 @@
    ========================================================= */
 
 /* ---------- Config: edit me ---------- */
-// Replace `live` / `code` with your real project + repo URLs.
+// Contact form delivery.
+//  - Leave FORMSPREE_ID empty → the form opens the visitor's email app
+//    with a message pre-addressed to CONTACT_EMAIL (works with zero setup).
+//  - For automatic delivery (no mail app needed), create a free form at
+//    https://formspree.io using ripaartem25@gmail.com, then paste its id
+//    (the part after /f/, e.g. "xeoyabcd") into FORMSPREE_ID.
+const CONTACT_EMAIL = "ripaartem25@gmail.com";
+const FORMSPREE_ID = "";
+
 const PROJECTS = [
   { no: "01", title: "Lumina", cat: "AI SaaS Platform", year: "2025",
     desc: "End-to-end analytics suite with real-time AI insights and a live 3D data globe.",
@@ -159,10 +167,6 @@ const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").mat
         <h3>${p.title}</h3>
         <p class="work-card__desc">${p.desc}</p>
         <div class="work-card__tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
-        <div class="work-card__links">
-          <a href="${p.live}" target="_blank" rel="noopener" data-cursor>Live ↗</a>
-          <a href="${p.code}" target="_blank" rel="noopener" data-cursor>Code ↗</a>
-        </div>
       </div>
     </article>`).join("");
 
@@ -209,22 +213,46 @@ const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").mat
   if (box) box.innerHTML = TECH.map((t) => `<span class="tech__chip">${t}</span>`).join("");
 })();
 
-/* ---------- Contact form (front-end only demo) ---------- */
+/* ---------- Contact form → delivers to CONTACT_EMAIL ---------- */
 (function form() {
   const f = $("#contactForm");
   const note = $("#formNote");
   if (!f) return;
-  f.addEventListener("submit", (e) => {
+  const fail = (msg) => { note.style.color = "#f87171"; note.textContent = msg; };
+
+  f.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(f);
-    if (!data.get("name") || !data.get("email") || !data.get("message")) {
-      note.style.color = "#f87171";
-      note.textContent = "Please fill in all fields.";
-      return;
-    }
+    const name = (data.get("name") || "").toString().trim();
+    const email = (data.get("email") || "").toString().trim();
+    const message = (data.get("message") || "").toString().trim();
+    if (!name || !email || !message) return fail("Please fill in all fields.");
+
     note.style.color = "";
-    note.textContent = `Thanks, ${data.get("name")}! This is a demo form — wire it to your backend or a service like Formspree.`;
-    f.reset();
+
+    if (FORMSPREE_ID) {
+      // Automatic delivery via Formspree → arrives in the CONTACT_EMAIL inbox.
+      note.textContent = "Sending…";
+      try {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: data,
+        });
+        if (!res.ok) throw new Error("send failed");
+        note.textContent = `Thanks, ${name}! Your message is on its way.`;
+        f.reset();
+      } catch {
+        fail(`Couldn't send right now — email me directly at ${CONTACT_EMAIL}`);
+      }
+    } else {
+      // Zero-setup fallback: open the visitor's email app addressed to CONTACT_EMAIL.
+      const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+      note.textContent = `Opening your email app to send to ${CONTACT_EMAIL}…`;
+      f.reset();
+    }
   });
 })();
 
