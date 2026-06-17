@@ -54,12 +54,16 @@ function heroScene() {
   const renderer = makeRenderer(host);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  // ---- materials ----
-  const skin   = new THREE.MeshPhysicalMaterial({ color: 0xd99873, roughness: 0.55, clearcoat: 0.4, clearcoatRoughness: 0.5, sheen: 0.5, sheenColor: new THREE.Color(0xffd9c0) });
-  const silver = new THREE.MeshPhysicalMaterial({ color: 0xeaeaf0, roughness: 0.28, metalness: 0.55, clearcoat: 1, clearcoatRoughness: 0.2 });
+  // ---- materials (tweak colors here) ----
+  const skin   = new THREE.MeshPhysicalMaterial({ color: 0xe0a97e, roughness: 0.5, clearcoat: 0.45, clearcoatRoughness: 0.5, sheen: 0.6, sheenColor: new THREE.Color(0xffd9c0) });
+  const silver = new THREE.MeshPhysicalMaterial({ color: 0xf0f0f4, roughness: 0.26, metalness: 0.55, clearcoat: 1, clearcoatRoughness: 0.2 }); // cap
   const dark   = new THREE.MeshStandardMaterial({ color: 0x16161d, roughness: 0.7 });
   const white  = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
   const black  = new THREE.MeshStandardMaterial({ color: 0x0b0b0d, roughness: 0.25 });
+  const matte  = new THREE.MeshStandardMaterial({ color: 0x1b1b22, roughness: 0.55, metalness: 0.2 });          // headphones
+  const accent = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, roughness: 0.35, metalness: 0.3, emissive: 0x3b1d6e, emissiveIntensity: 0.5 });
+  const frame  = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.3, metalness: 0.6 });           // glasses frame
+  const lens   = new THREE.MeshPhysicalMaterial({ color: 0x0a0a0f, roughness: 0.08, metalness: 0.1, transparent: true, opacity: 0.6 });
 
   // ---- character group ----
   const head = new THREE.Group();
@@ -128,6 +132,43 @@ function heroScene() {
   const button = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), silver);
   button.position.set(0, 1.44, 0);
   head.add(button);
+
+  // ---- glasses ----
+  const glasses = new THREE.Group();
+  [-1, 1].forEach((s) => {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.035, 16, 36), frame);
+    ring.position.set(s * 0.42, 0.08, 1.02);
+    glasses.add(ring);
+    const glass = new THREE.Mesh(new THREE.CircleGeometry(0.24, 36), lens);
+    glass.position.set(s * 0.42, 0.08, 1.03);
+    glasses.add(glass);
+    // temple arm running back toward the ear
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.04, 0.04), frame);
+    arm.position.set(s * 0.8, 0.12, 0.6);
+    arm.rotation.y = s * 0.55;
+    glasses.add(arm);
+  });
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.045, 0.05), frame);
+  bridge.position.set(0, 0.12, 1.04);
+  glasses.add(bridge);
+  head.add(glasses);
+
+  // ---- over-ear headphones ----
+  const headphones = new THREE.Group();
+  const band = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.07, 16, 48, Math.PI), matte);
+  band.position.set(0, -0.02, -0.12);
+  headphones.add(band);
+  [-1, 1].forEach((s) => {
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.22, 32), matte);
+    cup.rotation.z = Math.PI / 2;
+    cup.position.set(s * 1.12, -0.05, 0.02);
+    headphones.add(cup);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.045, 16, 32), accent);
+    ring.rotation.y = Math.PI / 2;
+    ring.position.set(s * 1.24, -0.05, 0.02);
+    headphones.add(ring);
+  });
+  head.add(headphones);
 
   head.position.y = 0.35;
 
