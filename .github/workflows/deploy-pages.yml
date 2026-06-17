@@ -32,6 +32,10 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Enable Pages automatically (sets the source to GitHub Actions),
+          # so no manual toggle in repo settings is required.
+          enablement: true
 
       - name: Upload portfolio as artifact
         uses: actions/upload-pages-artifact@v3
