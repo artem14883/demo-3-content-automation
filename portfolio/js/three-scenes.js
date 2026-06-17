@@ -88,10 +88,10 @@ function heroScene() {
     eyeW.scale.set(1, 1.05, 0.92);
     head.add(eyeW);
     const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), black);
-    pupil.position.set(s * 0.4, 0.0, 0.98);
+    pupil.position.set(s * 0.4, 0.04, 0.99);
     head.add(pupil);
     const spark = new THREE.Mesh(new THREE.SphereGeometry(0.028, 16, 16), hl);
-    spark.position.set(s * 0.45, 0.08, 1.07);
+    spark.position.set(s * 0.44, 0.09, 1.08);
     head.add(spark);
   });
 
