@@ -33,10 +33,22 @@ python3 -m http.server 8000
 
 ## Deploy
 
-It's a static site — drop the `portfolio/` folder on any static host:
+It's a static site — no build step.
 
-- **GitHub Pages**: enable Pages and point it at this folder (or move files to the repo root / `docs/`).
-- **Vercel / Netlify**: set the project/publish directory to `portfolio`.
+### GitHub Pages (automated)
+
+A workflow at `.github/workflows/deploy-pages.yml` publishes the `portfolio/`
+folder to GitHub Pages on every push to `main` (and the dev branch).
+
+One-time setup: **Repo → Settings → Pages → Build and deployment → Source: GitHub Actions.**
+After that, each push redeploys automatically. The live URL appears in the
+workflow run summary and under Settings → Pages.
+
+### Vercel / Netlify
+
+- **Vercel**: import the repo, set **Root Directory = `portfolio`**, framework
+  preset **Other**, no build command. Deploy.
+- **Netlify**: set **Publish directory = `portfolio`**, no build command.
 
 ## Customize
 
