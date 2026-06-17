@@ -82,6 +82,7 @@ function heroScene() {
 
   // eyes (rounded eyeball + pupil + glossy catchlight)
   const hl = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const pupils = [];
   [-1, 1].forEach((s) => {
     const eyeW = new THREE.Mesh(new THREE.SphereGeometry(0.23, 48, 48), white);
     eyeW.position.set(s * 0.4, 0.03, 0.86);
@@ -89,7 +90,10 @@ function heroScene() {
     head.add(eyeW);
     const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), black);
     pupil.position.set(s * 0.4, 0.04, 0.99);
+    pupil.userData.bx = s * 0.4;
+    pupil.userData.by = 0.04;
     head.add(pupil);
+    pupils.push(pupil);
     const spark = new THREE.Mesh(new THREE.SphereGeometry(0.028, 16, 16), hl);
     spark.position.set(s * 0.44, 0.09, 1.08);
     head.add(spark);
@@ -210,6 +214,13 @@ function heroScene() {
     // head follows cursor
     head.rotation.y = lerp(head.rotation.y, pointer.x * 0.6, 0.07);
     head.rotation.x = lerp(head.rotation.x, pointer.y * 0.35, 0.07);
+
+    // eyes follow the cursor (pupils glance toward the pointer)
+    const ex = pointer.x * 0.05, ey = -pointer.y * 0.04;
+    pupils.forEach((p) => {
+      p.position.x = lerp(p.position.x, p.userData.bx + ex, 0.15);
+      p.position.y = lerp(p.position.y, p.userData.by + ey, 0.15);
+    });
 
     // gentle idle float
     char.position.y = reduced ? 0 : Math.sin(t * 1.2) * 0.06;
