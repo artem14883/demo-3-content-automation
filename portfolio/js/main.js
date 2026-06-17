@@ -5,11 +5,24 @@
 
 /* ---------- Config: edit me ---------- */
 const PROJECTS = [
-  { no: "01", title: "Aurora Studio", cat: "Web · 3D", tags: ["Next.js", "Three.js", "GSAP"], hue: 268 },
-  { no: "02", title: "Nebula Finance", cat: "Product Design", tags: ["React", "TypeScript", "Tailwind"], hue: 322 },
-  { no: "03", title: "Form & Function", cat: "Brand · Web", tags: ["Webflow", "Motion", "GLSL"], hue: 190 },
-  { no: "04", title: "Echo Commerce", cat: "E-commerce", tags: ["Shopify", "Liquid", "Node"], hue: 28 },
-  { no: "05", title: "Pulse Dashboard", cat: "SaaS App", tags: ["Vue", "D3", "Figma"], hue: 150 },
+  { no: "01", title: "Lumina", cat: "AI SaaS Platform", year: "2025",
+    desc: "End-to-end analytics suite with real-time AI insights and a live 3D data globe.",
+    tags: ["Next.js", "TypeScript", "Three.js", "OpenAI"], hue: 268 },
+  { no: "02", title: "Vault", cat: "Fintech · Mobile Banking", year: "2025",
+    desc: "A premium neobank experience — payments, cards and investing in one fluid app.",
+    tags: ["React Native", "Node", "Stripe", "PostgreSQL"], hue: 322 },
+  { no: "03", title: "Atelier Noir", cat: "Luxury E-commerce", year: "2024",
+    desc: "Headless storefront for a fashion house with cinematic product reveals.",
+    tags: ["Shopify Hydrogen", "GSAP", "GLSL"], hue: 28 },
+  { no: "04", title: "Orbit", cat: "3D Product Configurator", year: "2024",
+    desc: "Real-time WebGL configurator letting customers customise products live.",
+    tags: ["Three.js", "React", "WebGL", "Vite"], hue: 190 },
+  { no: "05", title: "Nimbus", cat: "Cloud Infrastructure", year: "2024",
+    desc: "Observability dashboard visualising clusters, cost and uptime at scale.",
+    tags: ["Vue", "D3", "Go", "Kubernetes"], hue: 150 },
+  { no: "06", title: "Helios", cat: "Web3 Brand & dApp", year: "2023",
+    desc: "Brand identity and decentralised app for a renewable-energy token ecosystem.",
+    tags: ["Next.js", "Solidity", "wagmi", "Framer"], hue: 45 },
 ];
 
 const TECH = ["JS","TS","React","Next","Node","Three.js","GSAP","WebGL","CSS","Figma","Vue","Git"];
@@ -120,10 +133,12 @@ const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").mat
           radial-gradient(120% 120% at 90% 90%, hsl(${(p.hue + 50) % 360} 85% 60% / .85), transparent 55%),
           #0c0c12;"></div>
         <span class="work-card__no">${p.no}</span>
+        <span class="work-card__year">${p.year}</span>
       </div>
       <div class="work-card__body">
         <span class="work-card__cat">${p.cat}</span>
         <h3>${p.title}</h3>
+        <p class="work-card__desc">${p.desc}</p>
         <div class="work-card__tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
       </div>
     </article>`).join("");

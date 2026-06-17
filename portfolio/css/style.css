@@ -218,31 +218,40 @@ section { position: relative; }
   z-index: 2;
   width: min(100% - 3rem, var(--maxw));
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: left;
 }
 .hero__hello {
   font-size: clamp(.9rem, 2vw, 1.2rem);
   color: var(--muted);
   letter-spacing: .1em;
-  margin-bottom: .4rem;
+  margin-bottom: .3rem;
 }
 .hero__name {
-  font-size: var(--fs-display);
+  font-size: clamp(2.8rem, 9vw, 8rem);
   line-height: 0.86;
   text-transform: uppercase;
 }
-.hero__role {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: .6rem 1.4rem;
-  margin-top: 1.4rem;
+.hero__col--right { text-align: right; display: flex; flex-direction: column; }
+.hero__role-line {
   font-family: "Space Grotesk", sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  font-size: clamp(1.1rem, 3.2vw, 2.4rem);
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  font-size: clamp(1.6rem, 5vw, 3.6rem);
 }
-.hero__role .a-creative { color: var(--muted); font-weight: 400; }
+.hero__role-line.a-creative { color: var(--muted); font-weight: 400; font-size: clamp(.9rem, 2vw, 1.4rem); letter-spacing: .1em; margin-bottom: .3rem; }
+.hero__role-sub {
+  margin-top: .8rem;
+  color: var(--muted);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: clamp(.78rem, 1.6vw, 1rem);
+}
 .hero__scroll {
   position: absolute;
   bottom: 2rem; left: 50%;
@@ -394,8 +403,19 @@ section { position: relative; }
   z-index: 2;
   text-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
+.work-card__year {
+  position: absolute;
+  top: 1.1rem; right: 1.3rem;
+  z-index: 2;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: .82rem;
+  letter-spacing: .12em;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
 .work-card__body { padding: 1.4rem 1.6rem 1.8rem; }
 .work-card__body h3 { font-size: 1.5rem; }
+.work-card__desc { color: var(--muted); font-size: .92rem; margin-top: .6rem; line-height: 1.45; }
 .work-card__cat { color: var(--violet); font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: .8rem; display: block; }
 .work-card__tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
 .tag {
@@ -537,6 +557,17 @@ section { position: relative; }
   .nav__links { gap: 1.3rem; }
   .nav__brand { display: none; }
   .contact__canvas { order: -1; }
+
+  .hero__inner {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    min-height: 88svh;
+    padding-bottom: 4rem;
+  }
+  .hero__col--right { text-align: center; align-items: center; }
+  .hero__col--left { margin-top: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }

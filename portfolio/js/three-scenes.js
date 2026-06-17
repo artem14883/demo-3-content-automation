@@ -40,51 +40,113 @@ addEventListener("mousemove", (e) => {
 });
 
 /* =========================================================
-   1) HERO — morphing iridescent blob
+   1) HERO — stylised 3D character (Memoji-style, cap on)
+      Built from primitives; head follows the cursor.
    ========================================================= */
 function heroScene() {
   const host = document.getElementById("heroCanvas");
   if (!host) return;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, host.clientWidth / host.clientHeight, 0.1, 100);
-  camera.position.z = 5;
+  const camera = new THREE.PerspectiveCamera(42, host.clientWidth / host.clientHeight, 0.1, 100);
+  camera.position.set(0, 0.15, 5.4);
 
   const renderer = makeRenderer(host);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  const geo = new THREE.IcosahedronGeometry(1.55, 24);
-  const base = geo.attributes.position.array.slice();
-  const count = geo.attributes.position.count;
+  // ---- materials ----
+  const skin   = new THREE.MeshPhysicalMaterial({ color: 0xd99873, roughness: 0.55, clearcoat: 0.4, clearcoatRoughness: 0.5, sheen: 0.5, sheenColor: new THREE.Color(0xffd9c0) });
+  const silver = new THREE.MeshPhysicalMaterial({ color: 0xeaeaf0, roughness: 0.28, metalness: 0.55, clearcoat: 1, clearcoatRoughness: 0.2 });
+  const dark   = new THREE.MeshStandardMaterial({ color: 0x16161d, roughness: 0.7 });
+  const white  = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+  const black  = new THREE.MeshStandardMaterial({ color: 0x0b0b0d, roughness: 0.25 });
 
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: 0x111118,
-    roughness: 0.18,
-    metalness: 0.4,
-    clearcoat: 1,
-    clearcoatRoughness: 0.25,
-    iridescence: 1,
-    iridescenceIOR: 1.6,
-    iridescenceThicknessRange: [120, 520],
-    sheen: 1,
-    sheenColor: new THREE.Color(0xec4899),
+  // ---- character group ----
+  const head = new THREE.Group();
+
+  const skull = new THREE.Mesh(new THREE.SphereGeometry(1.1, 64, 64), skin);
+  skull.scale.set(1, 1.07, 0.95);
+  head.add(skull);
+
+  // ears
+  [-1, 1].forEach((s) => {
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), skin);
+    ear.position.set(s * 1.02, -0.06, 0);
+    ear.scale.set(0.7, 1, 0.7);
+    head.add(ear);
   });
-  const mesh = new THREE.Mesh(geo, mat);
-  scene.add(mesh);
 
-  // colored studio lights for the glow
-  const l1 = new THREE.PointLight(0x8b5cf6, 90, 30); l1.position.set(4, 3, 4);
-  const l2 = new THREE.PointLight(0xec4899, 70, 30); l2.position.set(-4, -2, 3);
-  const l3 = new THREE.PointLight(0x22d3ee, 40, 30); l3.position.set(0, 4, -4);
-  scene.add(l1, l2, l3, new THREE.AmbientLight(0x404050, 1.2));
+  // eyes (white + pupil)
+  [-1, 1].forEach((s) => {
+    const eyeW = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 32), white);
+    eyeW.position.set(s * 0.4, 0.08, 0.9);
+    eyeW.scale.set(1, 1.15, 0.6);
+    head.add(eyeW);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 24), black);
+    pupil.position.set(s * 0.4, 0.06, 1.02);
+    head.add(pupil);
+  });
 
-  // pseudo-noise displacement
-  const noise = (x, y, z, t) =>
-    Math.sin(x * 1.5 + t) * 0.5 +
-    Math.sin(y * 1.8 + t * 1.3) * 0.4 +
-    Math.sin(z * 2.1 + t * 0.7) * 0.35;
+  // eyebrows
+  [-1, 1].forEach((s) => {
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.07, 0.12), dark);
+    brow.position.set(s * 0.4, 0.42, 0.93);
+    brow.rotation.z = s * -0.12;
+    head.add(brow);
+  });
 
-  const pos = geo.attributes.position;
-  const v = new THREE.Vector3();
+  // nose
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 24), skin);
+  nose.position.set(0, -0.1, 1.04);
+  nose.scale.set(1, 0.9, 0.85);
+  head.add(nose);
+
+  // smile (lower half of a torus)
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.055, 16, 40, Math.PI), black);
+  mouth.position.set(0, -0.4, 0.9);
+  mouth.rotation.z = Math.PI;
+  mouth.scale.set(1, 0.8, 1);
+  head.add(mouth);
+
+  // cap dome (upper hemisphere)
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(1.17, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.52),
+    silver
+  );
+  dome.position.set(0, 0.3, 0);
+  dome.scale.set(1.02, 1, 1.0);
+  head.add(dome);
+
+  // cap brim
+  const brim = new THREE.Mesh(new THREE.SphereGeometry(0.92, 40, 20), silver);
+  brim.scale.set(0.95, 0.1, 1.15);
+  brim.position.set(0, 0.52, 0.62);
+  brim.rotation.x = -0.18;
+  head.add(brim);
+
+  // cap button
+  const button = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), silver);
+  button.position.set(0, 1.44, 0);
+  head.add(button);
+
+  head.position.y = 0.35;
+
+  // shoulders / sweater (stays static, doesn't turn with the head)
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(1.0, 0.8, 16, 32), dark);
+  torso.position.set(0, -2.05, 0);
+  torso.scale.set(1.55, 1, 1.0);
+
+  const char = new THREE.Group();
+  char.add(head, torso);
+  scene.add(char);
+
+  // ---- lights ----
+  scene.add(new THREE.AmbientLight(0x556070, 1.5));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(2, 4, 5); scene.add(key);
+  const l1  = new THREE.PointLight(0x8b5cf6, 90, 30); l1.position.set(-4, 2, 3); scene.add(l1);
+  const l2  = new THREE.PointLight(0xec4899, 75, 30); l2.position.set(4, -1, 3); scene.add(l2);
+  const l3  = new THREE.PointLight(0x22d3ee, 45, 30); l3.position.set(0, 3, -4); scene.add(l3);
+
   const visible = onScreen(host);
   const clock = new THREE.Clock();
 
@@ -98,23 +160,15 @@ function heroScene() {
   function tick() {
     requestAnimationFrame(tick);
     if (!visible()) return;
-    const t = clock.getElapsedTime() * (reduced ? 0 : 0.6);
+    const t = clock.getElapsedTime();
 
-    for (let i = 0; i < count; i++) {
-      const ix = i * 3;
-      v.set(base[ix], base[ix + 1], base[ix + 2]);
-      const len = v.length();
-      const n = noise(v.x, v.y, v.z, t) * 0.16;
-      v.normalize().multiplyScalar(len + n);
-      pos.array[ix] = v.x; pos.array[ix + 1] = v.y; pos.array[ix + 2] = v.z;
-    }
-    pos.needsUpdate = true;
-    geo.computeVertexNormals();
+    // head follows cursor
+    head.rotation.y = lerp(head.rotation.y, pointer.x * 0.6, 0.07);
+    head.rotation.x = lerp(head.rotation.x, pointer.y * 0.35, 0.07);
 
-    mesh.rotation.y += 0.0025;
-    mesh.rotation.x = lerp(mesh.rotation.x, pointer.y * 0.3, 0.05);
-    camera.position.x = lerp(camera.position.x, pointer.x * 0.6, 0.05);
-    camera.lookAt(0, 0, 0);
+    // gentle idle float
+    char.position.y = reduced ? 0 : Math.sin(t * 1.2) * 0.06;
+    char.rotation.y = lerp(char.rotation.y, pointer.x * 0.15, 0.05);
 
     renderer.render(scene, camera);
   }
