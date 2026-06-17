@@ -52,7 +52,7 @@ const TIMELINE = [
     desc: "Fell in love with the web — turning code into things people can see, touch and feel." },
 ];
 
-const TECH = ["JS","TS","React","Next","Node","Three.js","GSAP","WebGL","CSS","Figma","Vue","Git"];
+const TECH = ["HTML","CSS","JS","TS","React","Next","Node","Three.js","GSAP","WebGL","Vue","Figma","Git"];
 
 /* ---------- Helpers ---------- */
 const $  = (s, c = document) => c.querySelector(s);

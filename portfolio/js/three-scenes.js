@@ -222,15 +222,29 @@ function heroScene() {
 function techScene() {
   const host = document.getElementById("techCanvas");
   if (!host) return;
-  const labels = ["JS","TS","React","Next","Node","Three","GSAP","WebGL","CSS","Figma","Vue","Git"];
-  const colors = [0xf7df1e,0x3178c6,0x61dafb,0xffffff,0x68a063,0x8b5cf6,0x88ce02,0x990000,0x2965f1,0xf24e1e,0x42b883,0xf05032];
+  // Each sphere shows one skill.
+  const skills = [
+    ["HTML",   0xe34f26],
+    ["CSS",    0x2965f1],
+    ["JS",     0xf7df1e],
+    ["TS",     0x3178c6],
+    ["React",  0x61dafb],
+    ["Next",   0xffffff],
+    ["Node",   0x68a063],
+    ["Three",  0xb0b0b8],
+    ["GSAP",   0x88ce02],
+    ["WebGL",  0xcf3b3b],
+    ["Vue",    0x42b883],
+    ["Figma",  0xf24e1e],
+    ["Git",    0xf05032],
+  ];
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, host.clientWidth / host.clientHeight, 0.1, 100);
-  camera.position.z = 10;
+  camera.position.z = 9.5;
   const renderer = makeRenderer(host);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+  scene.add(new THREE.AmbientLight(0xffffff, 1.15));
   const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(5, 6, 8); scene.add(key);
   const rim = new THREE.PointLight(0x8b5cf6, 60, 40); rim.position.set(-6, -4, 4); scene.add(rim);
 
@@ -238,35 +252,55 @@ function techScene() {
     const s = 256;
     const c = document.createElement("canvas"); c.width = c.height = s;
     const ctx = c.getContext("2d");
+    // full fill so the whole sphere is the brand colour (no transparent corners)
     ctx.fillStyle = "#" + hex.toString(16).padStart(6, "0");
-    ctx.beginPath(); ctx.arc(s/2, s/2, s/2, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = (hex === 0xffffff) ? "#111" : "#fff";
-    ctx.font = "bold 70px 'Space Grotesk', sans-serif";
+    ctx.fillRect(0, 0, s, s);
+    // contrast text colour from luminance
+    const r = (hex >> 16) & 255, g = (hex >> 8) & 255, b = hex & 255;
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    ctx.fillStyle = lum > 150 ? "#15151b" : "#ffffff";
+    ctx.font = "bold 60px 'Space Grotesk', Arial, sans-serif";
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(text, s/2, s/2 + 4);
+    // u=0.5 faces the camera; mirror at the seam so it reads from behind too
+    ctx.fillText(text, s * 0.5, s * 0.5);
     const tex = new THREE.CanvasTexture(c);
-    tex.anisotropy = 4;
+    tex.anisotropy = 8;
     return tex;
   }
 
   const balls = [];
-  const R = 4.2;
-  labels.forEach((label, i) => {
-    const r = 0.55 + Math.random() * 0.35;
-    const g = new THREE.SphereGeometry(r, 32, 32);
-    const m = new THREE.MeshStandardMaterial({
-      map: labelTexture(label, colors[i]),
-      roughness: 0.35, metalness: 0.1,
-    });
-    const mesh = new THREE.Mesh(g, m);
-    mesh.position.set((Math.random()-0.5)*R*2, (Math.random()-0.5)*R, (Math.random()-0.5)*R);
-    mesh.userData.vel = new THREE.Vector3((Math.random()-0.5)*0.01,(Math.random()-0.5)*0.01,(Math.random()-0.5)*0.01);
+  skills.forEach(([label, hex]) => {
+    const r = 0.6 + Math.random() * 0.25;
+    const m = new THREE.MeshStandardMaterial({ map: labelTexture(label, hex), roughness: 0.4, metalness: 0.05 });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 48), m);
+    // spread them out across the field
+    mesh.position.set((Math.random() - 0.5) * 11, (Math.random() - 0.5) * 5.5, (Math.random() - 0.5) * 4);
+    mesh.userData.vel = new THREE.Vector3();
     mesh.userData.r = r;
     scene.add(mesh);
     balls.push(mesh);
   });
 
+  // mouse tracking relative to the canvas (for ray-based repulsion)
+  const ndc = new THREE.Vector2(-5, -5);
+  let hovering = false;
+  host.addEventListener("pointermove", (e) => {
+    const rect = host.getBoundingClientRect();
+    ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    hovering = true;
+  });
+  host.addEventListener("pointerleave", () => { hovering = false; });
+
+  const ray = new THREE.Raycaster();
+  const closest = new THREE.Vector3();
+  const tmp = new THREE.Vector3();
   const visible = onScreen(host);
+
+  // keep spheres apart and inside a comfortable box
+  const BOUND = new THREE.Vector3(6, 3.1, 2.2);
+  const GAP = 1.15;          // extra spacing kept between spheres
+  const MOUSE_R = 2.7;       // how close the cursor must get to scatter a ball
 
   function resize() {
     camera.aspect = host.clientWidth / host.clientHeight;
@@ -275,35 +309,51 @@ function techScene() {
   }
   addEventListener("resize", resize);
 
-  const center = new THREE.Vector3(0, 0, 0);
-  const tmp = new THREE.Vector3();
-
   function tick() {
     requestAnimationFrame(tick);
     if (!visible()) return;
 
+    // mouse repulsion: push balls away from the cursor ray
+    if (hovering && !reduced) {
+      ray.setFromCamera(ndc, camera);
+      balls.forEach((b) => {
+        ray.ray.closestPointToPoint(b.position, closest);
+        tmp.copy(b.position).sub(closest);
+        const d = tmp.length();
+        if (d < MOUSE_R) {
+          tmp.normalize().multiplyScalar((MOUSE_R - d) * 0.085);
+          b.userData.vel.add(tmp);
+        }
+      });
+    }
+
     balls.forEach((b, i) => {
-      // gentle pull toward center + soft separation
-      tmp.copy(center).sub(b.position).multiplyScalar(0.0006);
-      b.userData.vel.add(tmp);
+      // mutual repulsion → keep distance between balls
       for (let j = i + 1; j < balls.length; j++) {
         const o = balls[j];
         tmp.copy(b.position).sub(o.position);
-        const d = tmp.length();
-        const min = b.userData.r + o.userData.r;
-        if (d < min && d > 0.0001) {
-          tmp.normalize().multiplyScalar((min - d) * 0.02);
+        const d = tmp.length() || 0.0001;
+        const min = b.userData.r + o.userData.r + GAP;
+        if (d < min) {
+          tmp.normalize().multiplyScalar((min - d) * 0.012);
           b.userData.vel.add(tmp);
           o.userData.vel.sub(tmp);
         }
       }
-      b.userData.vel.multiplyScalar(0.985);
+      // soft containment so they don't drift off-screen
+      ["x", "y", "z"].forEach((ax) => {
+        const lim = BOUND[ax];
+        if (b.position[ax] >  lim) b.userData.vel[ax] -= (b.position[ax] - lim) * 0.01;
+        if (b.position[ax] < -lim) b.userData.vel[ax] -= (b.position[ax] + lim) * 0.01;
+      });
+      // gentle idle drift
+      if (!reduced) {
+        b.userData.vel.x += (Math.random() - 0.5) * 0.0008;
+        b.userData.vel.y += (Math.random() - 0.5) * 0.0008;
+      }
+      b.userData.vel.multiplyScalar(0.94);
       if (!reduced) b.position.add(b.userData.vel);
-      b.rotation.x += 0.003; b.rotation.y += 0.004;
     });
-
-    scene.rotation.y = lerp(scene.rotation.y, pointer.x * 0.5, 0.04);
-    scene.rotation.x = lerp(scene.rotation.x, pointer.y * 0.3, 0.04);
 
     renderer.render(scene, camera);
   }
