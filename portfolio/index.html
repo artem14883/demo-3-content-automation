@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artem — Creative Developer & Designer</title>
+  <meta name="description" content="3D creative portfolio of Artem — creative developer & designer building immersive web experiences." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Three.js via import map (renders in the visitor's browser) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Custom cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Preloader -->
+  <div class="loader" id="loader">
+    <div class="loader__count" id="loaderCount">0</div>
+    <div class="loader__label">Loading experience</div>
+    <div class="loader__bar" id="loaderBar"></div>
+  </div>
+
+  <div class="bg-glow"></div>
+
+  <!-- Nav -->
+  <header class="nav" id="nav">
+    <a href="mailto:hello@artem.dev" class="nav__brand" data-cursor>hello@artem.dev</a>
+    <nav class="nav__links">
+      <a href="#about" class="nav__link" data-cursor>About</a>
+      <a href="#work" class="nav__link" data-cursor>Work</a>
+      <a href="#stack" class="nav__link" data-cursor>Stack</a>
+      <a href="#contact" class="nav__link" data-cursor>Contact</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="hero__canvas" id="heroCanvas"></div>
+    <div class="hero__inner">
+      <p class="hero__hello">Hello! I'm</p>
+      <h1 class="hero__name">Artem</h1>
+      <div class="hero__role">
+        <span class="a-creative">A Creative</span>
+        <span>Developer</span>
+        <span class="gradient-text">Designer</span>
+      </div>
+    </div>
+    <div class="hero__scroll">Scroll<span></span></div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marquee">
+      <span class="marquee__item">Creative Development</span>
+      <span class="marquee__item">3D Experiences</span>
+      <span class="marquee__item">UI / UX Design</span>
+      <span class="marquee__item">WebGL</span>
+      <span class="marquee__item">Motion</span>
+    </div>
+  </div>
+
+  <!-- About / What I do -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="section__head reveal">
+        <h2 class="section__title">What<br />I Do</h2>
+        <p class="section__desc">I design and build immersive digital products — blending clean interfaces with playful 3D and motion.</p>
+      </div>
+
+      <div class="about__grid">
+        <div class="reveal reveal-d1">
+          <p class="about__lead">I'm a creative developer who turns ideas into <em class="gradient-text">interactive, memorable</em> web experiences.</p>
+          <p class="about__text">From concept to deployment, I obsess over the details — typography, timing, and the little interactions that make a site feel alive. Currently available for freelance & collaborations.</p>
+          <div class="stats">
+            <div class="stat"><div class="stat__num">5+</div><div class="stat__label">Years experience</div></div>
+            <div class="stat"><div class="stat__num">40+</div><div class="stat__label">Projects shipped</div></div>
+            <div class="stat"><div class="stat__num">12</div><div class="stat__label">Awards & mentions</div></div>
+          </div>
+        </div>
+
+        <div class="services reveal reveal-d2">
+          <div class="service" data-cursor>
+            <span class="service__no">01</span>
+            <div class="service__body"><h4>Web Development</h4><p>Fast, accessible front-ends with React, Next.js & TypeScript.</p></div>
+          </div>
+          <div class="service" data-cursor>
+            <span class="service__no">02</span>
+            <div class="service__body"><h4>3D & WebGL</h4><p>Interactive scenes and product visuals with Three.js & GLSL.</p></div>
+          </div>
+          <div class="service" data-cursor>
+            <span class="service__no">03</span>
+            <div class="service__body"><h4>UI / UX Design</h4><p>Design systems and interfaces that are clean and a joy to use.</p></div>
+          </div>
+          <div class="service" data-cursor>
+            <span class="service__no">04</span>
+            <div class="service__body"><h4>Motion Design</h4><p>Micro-interactions and animation that bring products to life.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="section" id="work">
+    <div class="container">
+      <div class="section__head reveal">
+        <h2 class="section__title">My<br />Work</h2>
+        <p class="section__desc">A selection of recent projects. Each one paired with a live 3D preview tile.</p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="work__track" id="workTrack">
+        <!-- cards injected by JS -->
+      </div>
+      <p class="work__hint">← Drag / scroll horizontally →</p>
+    </div>
+  </section>
+
+  <!-- Tech stack -->
+  <section class="section tech" id="stack">
+    <div class="container">
+      <div class="section__head reveal">
+        <h2 class="section__title">My<br />Tech Stack</h2>
+        <p class="section__desc">Tools I reach for — floating in zero gravity. Drag to nudge them around.</p>
+      </div>
+    </div>
+    <div class="tech__canvas" id="techCanvas"></div>
+    <div class="container">
+      <div class="tech__fallback" id="techFallback"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="contact__grid">
+        <div class="reveal">
+          <p class="eyebrow">Get in touch</p>
+          <h2 class="contact__title">Contact<span class="dot">.</span></h2>
+          <form id="contactForm" novalidate>
+            <div class="field">
+              <label for="name">Your Name</label>
+              <input id="name" name="name" type="text" placeholder="What's your name?" required />
+            </div>
+            <div class="field">
+              <label for="email">Your Email</label>
+              <input id="email" name="email" type="email" placeholder="What's your email?" required />
+            </div>
+            <div class="field">
+              <label for="message">Your Message</label>
+              <textarea id="message" name="message" placeholder="What do you want to say?" required></textarea>
+            </div>
+            <button class="btn" type="submit" data-cursor><span>Send message →</span></button>
+            <p class="form-note" id="formNote"></p>
+          </form>
+        </div>
+        <div class="contact__canvas reveal reveal-d1" id="contactCanvas"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__big">
+        <a href="mailto:hello@artem.dev" data-cursor>Let's talk →</a>
+      </div>
+      <div class="footer__row">
+        <span>© <span id="year"></span> Artem. Crafted with care.</span>
+        <div class="footer__socials">
+          <a href="#" data-cursor>Instagram</a>
+          <a href="#" data-cursor>GitHub</a>
+          <a href="#" data-cursor>LinkedIn</a>
+          <a href="#" data-cursor>Dribbble</a>
+        </div>
+        <a href="#home" data-cursor>Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./js/three-scenes.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
